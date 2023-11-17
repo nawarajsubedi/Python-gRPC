@@ -1,5 +1,7 @@
 import logging
 import os
+import signal
+import threading
 from concurrent import futures
 
 import grpc
@@ -31,7 +33,18 @@ def serve():
     server, port = create_server(PORT)
     server.start()
     logger.info('server started on port %s', port)
-    server.wait_for_termination()
+
+    done = threading.Event()
+
+    def stop(signum, frame):
+        logger.info('stopping server')
+        # wait up to 5 sec for running calls to finish
+        server.stop(5).wait()
+        done.set()
+
+    signal.signal(signal.SIGTERM, stop)
+    signal.signal(signal.SIGINT, stop)
+    done.wait()
 
 
 if __name__ == '__main__':
