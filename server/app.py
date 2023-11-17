@@ -1,4 +1,5 @@
 import logging
+import os
 from concurrent import futures
 
 import grpc
@@ -8,6 +9,9 @@ import hello_pb2_grpc
 
 logger = logging.getLogger(__name__)
 
+PORT = int(os.environ.get('GRPC_PORT', 50051))
+MAX_WORKERS = int(os.environ.get('GRPC_MAX_WORKERS', 10))
+
 
 class HelloWorld(hello_pb2_grpc.HelloServicer):
     def printHello(self, request, context):
@@ -15,12 +19,18 @@ class HelloWorld(hello_pb2_grpc.HelloServicer):
         return hello_pb2.HelloWorldResponse(id=request.id)
 
 
-def serve():
-    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+def create_server(port, max_workers=MAX_WORKERS):
+    server = grpc.server(futures.ThreadPoolExecutor(max_workers=max_workers))
     hello_pb2_grpc.add_HelloServicer_to_server(HelloWorld(), server)
-    server.add_insecure_port('[::]:50051')
+    # port 0 means pick any free port, returns the real one
+    port = server.add_insecure_port(f'[::]:{port}')
+    return server, port
+
+
+def serve():
+    server, port = create_server(PORT)
     server.start()
-    logger.info('server started on port 50051')
+    logger.info('server started on port %s', port)
     server.wait_for_termination()
 
 
