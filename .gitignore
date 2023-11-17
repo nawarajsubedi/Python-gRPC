@@ -17,3 +17,5 @@ __pycache__
 .pytest_cache
 .tool-versions
 node_modules/
+.venv
+.idea
