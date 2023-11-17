@@ -2,6 +2,7 @@ syntax = "proto3";
 package hello;
 
 service Hello {
+    // send an id and get the same id back
     rpc printHello(HelloWorldRequest) returns (HelloWorldResponse) {}
 }
 

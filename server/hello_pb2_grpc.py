@@ -25,7 +25,8 @@ class HelloServicer(object):
     """Missing associated documentation comment in .proto file."""
 
     def printHello(self, request, context):
-        """Missing associated documentation comment in .proto file."""
+        """send an id and get the same id back
+        """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
