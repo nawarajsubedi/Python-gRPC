@@ -20,6 +20,12 @@ def say_hello(stub, args):
     print(response.message)
 
 
+def say_hello_stream(stub, args):
+    request = hello_pb2.GreetRequest(name=args.name, count=args.count)
+    for reply in stub.SayHelloStream(request, timeout=TIMEOUT):
+        print(reply.message)
+
+
 def get_args():
     parser = argparse.ArgumentParser(description='client for the hello grpc server')
     parser.add_argument('--target', default=TARGET, help='server address (default %(default)s)')
@@ -34,6 +40,11 @@ def get_args():
     p = sub.add_parser('say-hello', help='call SayHello')
     p.add_argument('name')
     p.set_defaults(func=say_hello)
+
+    p = sub.add_parser('say-hello-stream', help='call SayHelloStream')
+    p.add_argument('name')
+    p.add_argument('--count', type=int, default=3)
+    p.set_defaults(func=say_hello_stream)
 
     return parser.parse_args()
 
