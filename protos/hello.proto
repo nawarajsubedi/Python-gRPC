@@ -7,6 +7,9 @@ service Hello {
 
     // greet one person
     rpc SayHello(GreetRequest) returns (GreetReply) {}
+
+    // server streaming, sends `count` greetings back
+    rpc SayHelloStream(GreetRequest) returns (stream GreetReply) {}
 }
 
 message HelloWorldResponse {
@@ -19,6 +22,7 @@ message HelloWorldRequest {
 
 message GreetRequest {
     string name = 1;
+    int32 count = 2;
 }
 
 message GreetReply {

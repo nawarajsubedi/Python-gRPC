@@ -17,10 +17,12 @@ class HelloWorldRequest(_message.Message):
     def __init__(self, id: _Optional[str] = ...) -> None: ...
 
 class GreetRequest(_message.Message):
-    __slots__ = ["name"]
+    __slots__ = ["name", "count"]
     NAME_FIELD_NUMBER: _ClassVar[int]
+    COUNT_FIELD_NUMBER: _ClassVar[int]
     name: str
-    def __init__(self, name: _Optional[str] = ...) -> None: ...
+    count: int
+    def __init__(self, name: _Optional[str] = ..., count: _Optional[int] = ...) -> None: ...
 
 class GreetReply(_message.Message):
     __slots__ = ["message"]

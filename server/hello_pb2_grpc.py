@@ -24,6 +24,11 @@ class HelloStub(object):
                 request_serializer=hello__pb2.GreetRequest.SerializeToString,
                 response_deserializer=hello__pb2.GreetReply.FromString,
                 )
+        self.SayHelloStream = channel.unary_stream(
+                '/hello.Hello/SayHelloStream',
+                request_serializer=hello__pb2.GreetRequest.SerializeToString,
+                response_deserializer=hello__pb2.GreetReply.FromString,
+                )
 
 
 class HelloServicer(object):
@@ -43,6 +48,13 @@ class HelloServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def SayHelloStream(self, request, context):
+        """server streaming, sends `count` greetings back
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_HelloServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -53,6 +65,11 @@ def add_HelloServicer_to_server(servicer, server):
             ),
             'SayHello': grpc.unary_unary_rpc_method_handler(
                     servicer.SayHello,
+                    request_deserializer=hello__pb2.GreetRequest.FromString,
+                    response_serializer=hello__pb2.GreetReply.SerializeToString,
+            ),
+            'SayHelloStream': grpc.unary_stream_rpc_method_handler(
+                    servicer.SayHelloStream,
                     request_deserializer=hello__pb2.GreetRequest.FromString,
                     response_serializer=hello__pb2.GreetReply.SerializeToString,
             ),
@@ -95,6 +112,23 @@ class Hello(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/hello.Hello/SayHello',
+            hello__pb2.GreetRequest.SerializeToString,
+            hello__pb2.GreetReply.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def SayHelloStream(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_stream(request, target, '/hello.Hello/SayHelloStream',
             hello__pb2.GreetRequest.SerializeToString,
             hello__pb2.GreetReply.FromString,
             options, channel_credentials,
