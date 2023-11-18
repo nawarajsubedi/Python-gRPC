@@ -15,6 +15,11 @@ def print_hello(stub, args):
     print(response.id)
 
 
+def say_hello(stub, args):
+    response = stub.SayHello(hello_pb2.GreetRequest(name=args.name), timeout=TIMEOUT)
+    print(response.message)
+
+
 def get_args():
     parser = argparse.ArgumentParser(description='client for the hello grpc server')
     parser.add_argument('--target', default=TARGET, help='server address (default %(default)s)')
@@ -25,6 +30,10 @@ def get_args():
     p = sub.add_parser('print-hello', help='call printHello')
     p.add_argument('--id', default='33')
     p.set_defaults(func=print_hello)
+
+    p = sub.add_parser('say-hello', help='call SayHello')
+    p.add_argument('name')
+    p.set_defaults(func=say_hello)
 
     return parser.parse_args()
 
