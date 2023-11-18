@@ -19,6 +19,11 @@ class HelloStub(object):
                 request_serializer=hello__pb2.HelloWorldRequest.SerializeToString,
                 response_deserializer=hello__pb2.HelloWorldResponse.FromString,
                 )
+        self.SayHello = channel.unary_unary(
+                '/hello.Hello/SayHello',
+                request_serializer=hello__pb2.GreetRequest.SerializeToString,
+                response_deserializer=hello__pb2.GreetReply.FromString,
+                )
 
 
 class HelloServicer(object):
@@ -31,6 +36,13 @@ class HelloServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def SayHello(self, request, context):
+        """greet one person
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_HelloServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -38,6 +50,11 @@ def add_HelloServicer_to_server(servicer, server):
                     servicer.printHello,
                     request_deserializer=hello__pb2.HelloWorldRequest.FromString,
                     response_serializer=hello__pb2.HelloWorldResponse.SerializeToString,
+            ),
+            'SayHello': grpc.unary_unary_rpc_method_handler(
+                    servicer.SayHello,
+                    request_deserializer=hello__pb2.GreetRequest.FromString,
+                    response_serializer=hello__pb2.GreetReply.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -63,5 +80,22 @@ class Hello(object):
         return grpc.experimental.unary_unary(request, target, '/hello.Hello/printHello',
             hello__pb2.HelloWorldRequest.SerializeToString,
             hello__pb2.HelloWorldResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def SayHello(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/hello.Hello/SayHello',
+            hello__pb2.GreetRequest.SerializeToString,
+            hello__pb2.GreetReply.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

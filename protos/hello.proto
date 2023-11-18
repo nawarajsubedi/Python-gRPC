@@ -4,6 +4,9 @@ package hello;
 service Hello {
     // send an id and get the same id back
     rpc printHello(HelloWorldRequest) returns (HelloWorldResponse) {}
+
+    // greet one person
+    rpc SayHello(GreetRequest) returns (GreetReply) {}
 }
 
 message HelloWorldResponse {
@@ -12,4 +15,12 @@ message HelloWorldResponse {
 
 message HelloWorldRequest {
     string id = 1;
+}
+
+message GreetRequest {
+    string name = 1;
+}
+
+message GreetReply {
+    string message = 1;
 }
