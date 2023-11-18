@@ -43,6 +43,12 @@ class HelloWorld(hello_pb2_grpc.HelloServicer):
                 break
             yield hello_pb2.GreetReply(message=f'Hello, {name}! ({i + 1}/{count})')
 
+    def SayHelloToMany(self, request_iterator, context):
+        names = [r.name.strip() for r in request_iterator if r.name.strip()]
+        if not names:
+            context.abort(grpc.StatusCode.INVALID_ARGUMENT, 'send at least one name')
+        return hello_pb2.GreetReply(message=f'Hello, {", ".join(names)}!')
+
 
 def create_server(port, max_workers=MAX_WORKERS):
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=max_workers))
