@@ -10,6 +10,9 @@ service Hello {
 
     // server streaming, sends `count` greetings back
     rpc SayHelloStream(GreetRequest) returns (stream GreetReply) {}
+
+    // client streaming, send many names and get one greeting for all
+    rpc SayHelloToMany(stream GreetRequest) returns (GreetReply) {}
 }
 
 message HelloWorldResponse {
