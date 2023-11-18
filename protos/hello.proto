@@ -13,6 +13,9 @@ service Hello {
 
     // client streaming, send many names and get one greeting for all
     rpc SayHelloToMany(stream GreetRequest) returns (GreetReply) {}
+
+    // bidirectional streaming, replies to each name as it comes
+    rpc Chat(stream GreetRequest) returns (stream GreetReply) {}
 }
 
 message HelloWorldResponse {

@@ -34,6 +34,11 @@ class HelloStub(object):
                 request_serializer=hello__pb2.GreetRequest.SerializeToString,
                 response_deserializer=hello__pb2.GreetReply.FromString,
                 )
+        self.Chat = channel.stream_stream(
+                '/hello.Hello/Chat',
+                request_serializer=hello__pb2.GreetRequest.SerializeToString,
+                response_deserializer=hello__pb2.GreetReply.FromString,
+                )
 
 
 class HelloServicer(object):
@@ -67,6 +72,13 @@ class HelloServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def Chat(self, request_iterator, context):
+        """bidirectional streaming, replies to each name as it comes
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_HelloServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -87,6 +99,11 @@ def add_HelloServicer_to_server(servicer, server):
             ),
             'SayHelloToMany': grpc.stream_unary_rpc_method_handler(
                     servicer.SayHelloToMany,
+                    request_deserializer=hello__pb2.GreetRequest.FromString,
+                    response_serializer=hello__pb2.GreetReply.SerializeToString,
+            ),
+            'Chat': grpc.stream_stream_rpc_method_handler(
+                    servicer.Chat,
                     request_deserializer=hello__pb2.GreetRequest.FromString,
                     response_serializer=hello__pb2.GreetReply.SerializeToString,
             ),
@@ -163,6 +180,23 @@ class Hello(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.stream_unary(request_iterator, target, '/hello.Hello/SayHelloToMany',
+            hello__pb2.GreetRequest.SerializeToString,
+            hello__pb2.GreetReply.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def Chat(request_iterator,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.stream_stream(request_iterator, target, '/hello.Hello/Chat',
             hello__pb2.GreetRequest.SerializeToString,
             hello__pb2.GreetReply.FromString,
             options, channel_credentials,
