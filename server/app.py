@@ -20,6 +20,9 @@ class HelloWorld(hello_pb2_grpc.HelloServicer):
         logger.info('printHello id=%s', request.id)
         return hello_pb2.HelloWorldResponse(id=request.id)
 
+    def SayHello(self, request, context):
+        return hello_pb2.GreetReply(message=f'Hello, {request.name}!')
+
 
 def create_server(port, max_workers=MAX_WORKERS):
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=max_workers))
