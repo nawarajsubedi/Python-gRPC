@@ -26,6 +26,12 @@ def say_hello_stream(stub, args):
         print(reply.message)
 
 
+def say_hello_to_many(stub, args):
+    requests = (hello_pb2.GreetRequest(name=name) for name in args.names)
+    response = stub.SayHelloToMany(requests, timeout=TIMEOUT)
+    print(response.message)
+
+
 def get_args():
     parser = argparse.ArgumentParser(description='client for the hello grpc server')
     parser.add_argument('--target', default=TARGET, help='server address (default %(default)s)')
@@ -45,6 +51,10 @@ def get_args():
     p.add_argument('name')
     p.add_argument('--count', type=int, default=3)
     p.set_defaults(func=say_hello_stream)
+
+    p = sub.add_parser('say-hello-many', help='call SayHelloToMany')
+    p.add_argument('names', nargs='+')
+    p.set_defaults(func=say_hello_to_many)
 
     return parser.parse_args()
 
