@@ -1,4 +1,5 @@
 import os
+import sys
 
 import grpc
 import hello_pb2
@@ -14,5 +15,10 @@ def run():
         response = stub.printHello(hello_pb2.HelloWorldRequest(id="33"), timeout=TIMEOUT)
     print(response.id)
 
+
 if __name__ == '__main__':
-    run()
+    try:
+        run()
+    except grpc.RpcError as e:
+        print(f'error: {e.code().name} {e.details()}', file=sys.stderr)
+        sys.exit(1)
