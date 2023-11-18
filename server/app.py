@@ -15,13 +15,21 @@ PORT = int(os.environ.get('GRPC_PORT', 50051))
 MAX_WORKERS = int(os.environ.get('GRPC_MAX_WORKERS', 10))
 
 
+def get_name(request, context):
+    name = request.name.strip()
+    if not name:
+        context.abort(grpc.StatusCode.INVALID_ARGUMENT, 'name is required')
+    return name
+
+
 class HelloWorld(hello_pb2_grpc.HelloServicer):
     def printHello(self, request, context):
         logger.info('printHello id=%s', request.id)
         return hello_pb2.HelloWorldResponse(id=request.id)
 
     def SayHello(self, request, context):
-        return hello_pb2.GreetReply(message=f'Hello, {request.name}!')
+        name = get_name(request, context)
+        return hello_pb2.GreetReply(message=f'Hello, {name}!')
 
 
 def create_server(port, max_workers=MAX_WORKERS):
