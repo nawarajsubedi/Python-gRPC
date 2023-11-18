@@ -31,6 +31,12 @@ class HelloWorld(hello_pb2_grpc.HelloServicer):
         name = get_name(request, context)
         return hello_pb2.GreetReply(message=f'Hello, {name}!')
 
+    def SayHelloStream(self, request, context):
+        name = get_name(request, context)
+        count = request.count or 3
+        for i in range(count):
+            yield hello_pb2.GreetReply(message=f'Hello, {name}! ({i + 1}/{count})')
+
 
 def create_server(port, max_workers=MAX_WORKERS):
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=max_workers))
