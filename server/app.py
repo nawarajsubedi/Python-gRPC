@@ -49,6 +49,12 @@ class HelloWorld(hello_pb2_grpc.HelloServicer):
             context.abort(grpc.StatusCode.INVALID_ARGUMENT, 'send at least one name')
         return hello_pb2.GreetReply(message=f'Hello, {", ".join(names)}!')
 
+    def Chat(self, request_iterator, context):
+        for request in request_iterator:
+            name = request.name.strip()
+            if name:
+                yield hello_pb2.GreetReply(message=f'Hello, {name}!')
+
 
 def create_server(port, max_workers=MAX_WORKERS):
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=max_workers))
