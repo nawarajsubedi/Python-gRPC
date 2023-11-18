@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 
 PORT = int(os.environ.get('GRPC_PORT', 50051))
 MAX_WORKERS = int(os.environ.get('GRPC_MAX_WORKERS', 10))
+MAX_COUNT = 100
 
 
 def get_name(request, context):
@@ -34,7 +35,12 @@ class HelloWorld(hello_pb2_grpc.HelloServicer):
     def SayHelloStream(self, request, context):
         name = get_name(request, context)
         count = request.count or 3
+        if count < 1 or count > MAX_COUNT:
+            context.abort(grpc.StatusCode.INVALID_ARGUMENT, f'count must be between 1 and {MAX_COUNT}')
         for i in range(count):
+            # stop if client cancelled or deadline passed
+            if not context.is_active():
+                break
             yield hello_pb2.GreetReply(message=f'Hello, {name}! ({i + 1}/{count})')
 
 
