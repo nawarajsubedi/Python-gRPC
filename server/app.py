@@ -5,6 +5,7 @@ import threading
 from concurrent import futures
 
 import grpc
+from grpc_health.v1 import health, health_pb2, health_pb2_grpc
 from grpc_reflection.v1alpha import reflection
 
 import hello_pb2
@@ -70,9 +71,15 @@ def create_server(port, max_workers=MAX_WORKERS):
     )
     hello_pb2_grpc.add_HelloServicer_to_server(HelloWorld(), server)
 
+    health_servicer = health.HealthServicer()
+    health_servicer.set('', health_pb2.HealthCheckResponse.SERVING)
+    health_servicer.set('hello.Hello', health_pb2.HealthCheckResponse.SERVING)
+    health_pb2_grpc.add_HealthServicer_to_server(health_servicer, server)
+
     # lets tools like grpcurl list the services without the proto file
     services = (
         hello_pb2.DESCRIPTOR.services_by_name['Hello'].full_name,
+        health.SERVICE_NAME,
         reflection.SERVICE_NAME,
     )
     reflection.enable_server_reflection(services, server)
