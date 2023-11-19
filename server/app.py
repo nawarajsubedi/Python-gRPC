@@ -23,6 +23,12 @@ def get_name(request, context):
     return name
 
 
+class LogInterceptor(grpc.ServerInterceptor):
+    def intercept_service(self, continuation, handler_call_details):
+        logger.info('call %s', handler_call_details.method)
+        return continuation(handler_call_details)
+
+
 class HelloWorld(hello_pb2_grpc.HelloServicer):
     def printHello(self, request, context):
         logger.info('printHello id=%s', request.id)
@@ -57,7 +63,10 @@ class HelloWorld(hello_pb2_grpc.HelloServicer):
 
 
 def create_server(port, max_workers=MAX_WORKERS):
-    server = grpc.server(futures.ThreadPoolExecutor(max_workers=max_workers))
+    server = grpc.server(
+        futures.ThreadPoolExecutor(max_workers=max_workers),
+        interceptors=[LogInterceptor()],
+    )
     hello_pb2_grpc.add_HelloServicer_to_server(HelloWorld(), server)
     # port 0 means pick any free port, returns the real one
     port = server.add_insecure_port(f'[::]:{port}')
