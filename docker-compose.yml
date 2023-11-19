@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  server:
+    build: .
+    ports:
+      - "50051:50051"
+
+  client:
+    build: .
+    command: python client/app.py say-hello docker
+    environment:
+      GRPC_TARGET: server:50051
+    depends_on:
+      - server
