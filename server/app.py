@@ -5,6 +5,7 @@ import threading
 from concurrent import futures
 
 import grpc
+from grpc_reflection.v1alpha import reflection
 
 import hello_pb2
 import hello_pb2_grpc
@@ -68,6 +69,14 @@ def create_server(port, max_workers=MAX_WORKERS):
         interceptors=[LogInterceptor()],
     )
     hello_pb2_grpc.add_HelloServicer_to_server(HelloWorld(), server)
+
+    # lets tools like grpcurl list the services without the proto file
+    services = (
+        hello_pb2.DESCRIPTOR.services_by_name['Hello'].full_name,
+        reflection.SERVICE_NAME,
+    )
+    reflection.enable_server_reflection(services, server)
+
     # port 0 means pick any free port, returns the real one
     port = server.add_insecure_port(f'[::]:{port}')
     return server, port
