@@ -32,6 +32,12 @@ def say_hello_to_many(stub, args):
     print(response.message)
 
 
+def chat(stub, args):
+    requests = (hello_pb2.GreetRequest(name=name) for name in args.names)
+    for reply in stub.Chat(requests, timeout=TIMEOUT):
+        print(reply.message)
+
+
 def get_args():
     parser = argparse.ArgumentParser(description='client for the hello grpc server')
     parser.add_argument('--target', default=TARGET, help='server address (default %(default)s)')
@@ -55,6 +61,10 @@ def get_args():
     p = sub.add_parser('say-hello-many', help='call SayHelloToMany')
     p.add_argument('names', nargs='+')
     p.set_defaults(func=say_hello_to_many)
+
+    p = sub.add_parser('chat', help='call Chat')
+    p.add_argument('names', nargs='+')
+    p.set_defaults(func=chat)
 
     return parser.parse_args()
 
