@@ -135,3 +135,50 @@ Health check:
 ```bash
 grpcurl -plaintext -d '{"service": "hello.Hello"}' localhost:50051 grpc.health.v1.Health/Check
 ```
+
+## Run the tests
+
+From the project root:
+
+```bash
+python -m pytest -v
+```
+
+The tests start the server in the same process on a free port, so nothing else needs to be running. They also run on GitHub Actions for every push to `main`.
+
+## Change the proto
+
+1. Edit `protos/hello.proto`.
+2. Regenerate the Python code for server and client:
+    ```bash
+    sh scripts/gen_protos.sh
+    ```
+3. Implement the new method in `server/app.py` and call it from `client/app.py`.
+
+The generated files (`hello_pb2.py`, `hello_pb2.pyi`, `hello_pb2_grpc.py`) are committed so the app runs without this step.
+
+## Make commands
+
+If you have `make`:
+
+```bash
+make install   # install dependencies
+make server    # start server
+make client    # run client
+make test      # run tests
+make proto     # regenerate code from proto
+make docker    # run server in docker
+```
+
+## Project structure
+
+```
+.
+├── protos/hello.proto      # service definition
+├── scripts/gen_protos.sh   # regenerates python code from the proto
+├── server/app.py           # grpc server
+├── client/app.py           # command line client
+├── tests/                  # pytest tests
+├── Dockerfile
+└── docker-compose.yml
+```
