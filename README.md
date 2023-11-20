@@ -100,3 +100,38 @@ Example:
 GRPC_PORT=6000 python app.py                              # server
 GRPC_TARGET=localhost:6000 python app.py say-hello Ram    # client
 ```
+
+## Run with Docker
+
+Requires Docker and docker-compose.
+
+1. Build and start the server:
+    ```bash
+    docker-compose up --build -d server
+    ```
+2. Run the client against it:
+    ```bash
+    docker-compose run --rm client
+    docker-compose run --rm client python client/app.py chat Ram Sita
+    ```
+3. Stop everything:
+    ```bash
+    docker-compose down
+    ```
+
+The server is also published on `localhost:50051`, so the local client from step 6 works too.
+
+## Try it with grpcurl
+
+The server has reflection turned on, so [grpcurl](https://github.com/fullstorydev/grpcurl) works without the proto file:
+
+```bash
+grpcurl -plaintext localhost:50051 list
+grpcurl -plaintext -d '{"name": "Ram"}' localhost:50051 hello.Hello/SayHello
+grpcurl -plaintext -d '{"name": "Ram", "count": 2}' localhost:50051 hello.Hello/SayHelloStream
+```
+
+Health check:
+```bash
+grpcurl -plaintext -d '{"service": "hello.Hello"}' localhost:50051 grpc.health.v1.Health/Check
+```
